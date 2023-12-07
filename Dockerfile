@@ -34,17 +34,17 @@ RUN apt-get update && apt-get install -y \
 # Setup CONDA (https://hub.docker.com/r/continuumio/miniconda3/~/dockerfile/)
 ENV MINICONDA_VERSION py39_4.11.0
 ENV MINICONDA_SHA256 4ee9c3aa53329cd7a63b49877c0babb49b19b7e5af29807b793a76bdb1d362b4
-RUN curl -k -o /miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh && \
-    echo $MINICONDA_SHA256 /miniconda.sh | sha256sum --check && \
-    /bin/bash /miniconda.sh -b -p /opt/conda && \
-    rm /miniconda.sh && \
-    /opt/conda/bin/conda update -c conda-forge -n base conda && \
-    /opt/conda/bin/conda clean -afy && \
-    /opt/conda/bin/conda init && \
-    find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-    /opt/conda/bin/conda install -y -c conda-forge -n base mamba && \
-    /opt/conda/bin/conda clean -afy
+RUN curl -k -o /miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh
+RUN echo $MINICONDA_SHA256 /miniconda.sh | sha256sum --check
+RUN /bin/bash /miniconda.sh -b -p /opt/conda
+RUN rm /miniconda.sh
+RUN /opt/conda/bin/conda update -c conda-forge -n base conda
+RUN /opt/conda/bin/conda clean -afy
+RUN /opt/conda/bin/conda init
+RUN find /opt/conda/ -follow -type f -name '*.a' -delete
+RUN find /opt/conda/ -follow -type f -name '*.js.map' -delete
+RUN /opt/conda/bin/conda install -y -c conda-forge -n base mamba
+RUN /opt/conda/bin/conda clean -afy
 
 ENV PATH /opt/conda/bin:$PATH
 
