@@ -6,6 +6,9 @@ on:
     types:
       - published
 
+env:
+  DOCKERHUB_IMAGE: veckothegecko/gutils
+
 jobs:
 
   pypi-build:
@@ -79,13 +82,13 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: false
-        tags: axiom/gutils:${{ github.event.release.tag_name }}
+        tags: ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }}
         cache-from: type=local,src=${ BUILDX_CACHE }
         cache-to: type=local,dest=${ BUILDX_CACHE }
         outputs: type=docker
 
     - name: Run tests from the Docker image
-      run: docker run axiom/gutils:${{ github.event.release.tag_name }} pytest -m "not long and not watch"
+      run: docker run ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }} pytest -m "not long and not watch"
 
   docker-push:
     name: Push tagged image to Docker Hub
@@ -118,6 +121,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: axiom/gutils:${{ github.event.release.tag_name }}
+        tags: ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }}
         cache-from: type=local,src=${ BUILDX_CACHE }
         cache-to: type=local,dest=${ BUILDX_CACHE }
