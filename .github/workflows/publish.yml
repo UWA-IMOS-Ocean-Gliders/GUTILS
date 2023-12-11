@@ -6,47 +6,10 @@ on:
     types:
       - published
 
+env:
+  DOCKERHUB_IMAGE: veckothegecko/gutils
+
 jobs:
-
-  pypi-build:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.9
-
-    - name: Get tags
-      run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-      shell: bash
-
-    - name: Install build tools
-      run: |
-        python -m pip install --upgrade pip wheel setuptools setuptools_scm build twine
-      shell: bash
-
-    - name: Build binary wheel
-      run: python -m build --sdist --wheel . --outdir dist
-
-    - name: CheckFiles
-      run: |
-        ls dist
-      shell: bash
-
-    - name: Test wheels
-      run: |
-        cd dist && python -m pip install gutils*.whl
-        python -m twine check *
-      shell: bash
-
-    - name: Publish a Python distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
-
   docker-build:
     name: Build and test Docker Image
     runs-on: ubuntu-20.04
@@ -79,13 +42,13 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: false
-        tags: axiom/gutils:${{ github.event.release.tag_name }}
+        tags: ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }}
         cache-from: type=local,src=${ BUILDX_CACHE }
         cache-to: type=local,dest=${ BUILDX_CACHE }
         outputs: type=docker
 
     - name: Run tests from the Docker image
-      run: docker run axiom/gutils:${{ github.event.release.tag_name }} pytest -m "not long and not watch"
+      run: docker run ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }} pytest -m "not long and not watch"
 
   docker-push:
     name: Push tagged image to Docker Hub
@@ -118,6 +81,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: axiom/gutils:${{ github.event.release.tag_name }}
+        tags: ${{ env.DOCKERHUB_IMAGE }}:${{ github.event.release.tag_name }}
         cache-from: type=local,src=${ BUILDX_CACHE }
         cache-to: type=local,dest=${ BUILDX_CACHE }
