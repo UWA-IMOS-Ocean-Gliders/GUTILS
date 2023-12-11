@@ -124,7 +124,7 @@ jobs:
         outputs: type=docker
 
     - name: Run tests from the Docker image
-      run: docker run ${{ env.DOCKERHUB_IMAGE }}:latest pytest -m "not long and not watch"
+      run: docker run -v $GITHUB_WORKSPACE/gutils/tests:/code/gutils/tests ${{ env.DOCKERHUB_IMAGE }}:latest pytest -m "not long and not watch"
 
   docker-push:
     name: Push latest image to Docker Hub
